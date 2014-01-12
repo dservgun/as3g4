@@ -1,0 +1,2 @@
+A place to keep references that were useful..
+http://www.antlr.org/wiki/display/ANTLR4/Actions+and+Attributes#ActionsandAttributes-Dynamically-ScopedAttributes

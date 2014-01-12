@@ -1,0 +1,12 @@
+//These re-write rules have missing tokens: I need to find out
+// what they do
+COMPILATION_UNIT,
+TYPE_BLOCK, METHOD_DEF, VAR_DEF,
+//
+What is EOF!
+
+What is the purpose of scope InOperator??
+
+as2 seems to be using ident and as3 identifier. Could be an issue.
+Perhaps we could name the above non-terminals as as2Identifier and
+as3Identifier to limit confusion?
