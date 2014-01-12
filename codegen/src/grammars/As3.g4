@@ -24,7 +24,7 @@
 grammar As3;
 @header {
     //Generated code sits here.
-    package org.as3g4.codegen
+    package org.as3g4.codegen;
 }
 // Originally derived from the ANTLRv2 ActionScript grammar by
 // Martin Schnabel, included in the ASDT project,
@@ -108,7 +108,7 @@ packageBlockEntry
       		)
       	;
 
-importDefinition :  IMPORT qualifiedName ('.' '*')? SEMI;
+importDefinition :  IMPORT identifierStar semi ;
 classDefinition: CLASS ident
                  classExtendsClause
                  implementsClause
@@ -118,7 +118,7 @@ as2ClassDefinition : CLASS identifier
                     classExtendsClause
                     implementsClause
                     typeBlock;
-interfaceDefinitionClause: INTERFACE ident
+interfaceDefinition: INTERFACE ident
                             interfaceExtendsClause
                             typeBlock;
 
@@ -141,10 +141,10 @@ typeBlockEntry :
 
 as2IncludeDirective : INCLUDE_DIRECTIVE | STRING_LITERAL;
 
-includeDirective: INCLUDE STRING_LITERAL SEMI;
+includeDirective: 'include' STRING_LITERAL SEMI;
 
 methodDefinition : FUNCTION
-    optionalAccesserRole
+    optionalAccessorRole
     ident
     parameterDeclarationList
     typeExpression?
@@ -166,7 +166,7 @@ parameterDeclaration: basicParameterDeclaration | parameterRestDeclaration;
 basicParameterDeclaration: CONST? ident typeExpression? parameterDefault?;
 parameterDefault : ASSIGN assignmentExpression;
 //REST -> ... multiple parameter list??
-parameterRestDefault: REST ident?;
+parameterRestDeclaration: REST ident?;
 block : LCURLY statement* RCURLY;
 condition: LPAREN expression RPAREN;
 statement : superStatement
@@ -217,7 +217,7 @@ switchStatement : SWITCH condition
 
 switchBlock : LCURLY
                  (caseStatement)*
-                 (defaultStamement)?
+                 (defaultStatement)?
                  RCURLY;
 
 
@@ -226,6 +226,7 @@ defaultStatement : DEFAULT COLON switchStatementList;
 switchStatementList: statement*;
 
 //Why should the for statement have only one statemen??
+forStatement : LPAREN forInClause statement RPAREN | LPAREN traditionalForClause statement RPAREN;
 forEachStatement :
         FOR EACH LPAREN forInClause RPAREN statement;
 
@@ -264,7 +265,7 @@ qualifiedIdentifier:
                    e4xAttributeIdentifier
                    | nonAttributeQualifiedIdentifier;
 
-qualifiedIdent : (namespace DBL_COLON)? ident;
+qualifiedIdent : (namespaceName DBL_COLON)? ident;
 namespaceName : IDENT | reservedNamespace;
 reservedNamespace:  PUBLIC | PRIVATE | PROTECTED |INTERNAL ;
 
@@ -313,7 +314,7 @@ assignmentOperator : ASSIGN
             | LOR_ASSIGN
             ;
 conditionalExpression:  logicalOrExpression (QUESTION conditionalSubExpression)?;
-conditionalExpression: assignmentExpression COLON assignmentExpression;
+conditionalSubExpression: assignmentExpression COLON assignmentExpression;
 logicalOrExpression : logicalAndExpression (logicalOrOperator logicalAndExpression)*;
 logicalOrOperator : LOR | OR;
 logicalAndExpression : bitwiseOrExpression (logicalAndOperator bitwiseOrExpression)*;
@@ -338,7 +339,7 @@ unaryExpressionNotPlusMinus : DELETE postfixExpression |
                                 | LNOT unaryExpression
                                 | BNOT unaryExpression
                                 | postfixExpression;
-postFixExpression: (primaryExpression
+postfixExpression: (primaryExpression
                    | propOrIdent
                    | LBRACK expression RBRACK
                    | E4X_DESC qualifiedIdentifier
@@ -380,8 +381,8 @@ number : HEX_LITERAL
 //Need to handle island grammar for xml literals
 // and regexp literals within
 //as code.
-//xmlLiteral :
-//regexpLiteral
+xmlLiteral : STRING_LITERAL;
+regexpLiteral : STRING_LITERAL;
 newExpression: NEW fullNewSubexpression;
 fullNewSubexpression : primaryExpression
 //Need to handle this.
@@ -794,14 +795,15 @@ NL
 		|	'\r'    	// Mac
 		|	'\n'    	// Unix
 		)
-		{$channel=HIDDEN;}
+		-> channel(HIDDEN)
 	;
 
 // skip BOM bytes
 BOM	:	(	'\u00EF'  '\u00BB' '\u00BF'
 		|	'\uFEFF'
 		)
-		{ $channel=HIDDEN; };
+		-> channel(HIDDEN)
+		;
 
 // might be better to filter this out as a preprocessing step
 INCLUDE_DIRECTIVE
